@@ -6,9 +6,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, useInView } from "framer-motion";
 import { Phone, Mail, MapPin, Clock, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { contactSchema, type ContactFormData } from "@/lib/validations";
-import {
-  SITE_CONFIG, CONTACT_REASONS, EQUIPMENT_INTEREST,
-} from "@/lib/constants";
+import { SITE_CONFIG, CONTACT_REASONS, EQUIPMENT_INTEREST } from "@/lib/constants";
+
+// ─────────────────────────────────────────────────────────────
+// FORMSPREE: Crea tu cuenta gratuita en https://formspree.io
+// Reemplaza "YOUR_FORM_ID" con el ID de tu formulario.
+// Ejemplo: si tu endpoint es https://formspree.io/f/xpwzabcd
+// entonces FORMSPREE_ID = "xpwzabcd"
+// ─────────────────────────────────────────────────────────────
+const FORMSPREE_ID = "YOUR_FORM_ID";
 
 const BUDGETS = [
   "Menos de $50,000",
@@ -23,7 +29,6 @@ export default function Contact() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [folio, setFolio] = useState("");
 
   const {
     register,
@@ -37,14 +42,27 @@ export default function Contact() {
   const onSubmit = async (data: ContactFormData) => {
     setStatus("loading");
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          nombre: data.nombre,
+          empresa: data.empresa || "",
+          telefono: data.telefono,
+          correo: data.correo,
+          _replyto: data.correo,
+          ciudad: data.ciudad,
+          tipoProyecto: data.tipoProyecto,
+          equipos: data.equipos || "",
+          presupuesto: data.presupuesto || "",
+          mensaje: data.mensaje,
+        }),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Error al enviar");
-      setFolio(json.folio || "");
+
+      if (!res.ok) throw new Error("Error al enviar");
       setStatus("success");
       reset();
     } catch {
@@ -162,14 +180,8 @@ export default function Contact() {
                     ¡Solicitud enviada con éxito!
                   </h3>
                   <p className="text-gray-300 mb-2">
-                    Gracias por contactarnos. Un asesor de GYM 360 Equipment se comunicará contigo.
+                    Gracias por contactarnos. Un asesor de GYM 360 Equipment se comunicará contigo a la brevedad.
                   </p>
-                  {folio && (
-                    <p className="text-gray-400 text-sm">
-                      Tu folio de seguimiento:{" "}
-                      <span className="text-accent font-mono font-bold">{folio}</span>
-                    </p>
-                  )}
                   <button
                     onClick={() => setStatus("idle")}
                     className="mt-8 btn-secondary"
@@ -326,13 +338,12 @@ export default function Contact() {
                     )}
                   </div>
 
-                  {/* Error message */}
+                  {/* Error */}
                   {status === "error" && (
                     <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
                       <AlertCircle size={18} className="text-red-400 flex-shrink-0" />
                       <p className="text-red-400 text-sm">
-                        Ocurrió un error al enviar tu solicitud. Por favor intenta de nuevo o contáctanos
-                        directamente por WhatsApp.
+                        Ocurrió un error al enviar. Intenta de nuevo o contáctanos directamente por WhatsApp.
                       </p>
                     </div>
                   )}

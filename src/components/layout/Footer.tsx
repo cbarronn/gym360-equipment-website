@@ -60,12 +60,14 @@ export default function Footer() {
             </p>
             {/* Social */}
             <div className="flex gap-3">
-              {[
-                { href: SITE_CONFIG.social.facebook, Icon: SocialIcons.Facebook, label: "Facebook" },
-                { href: SITE_CONFIG.social.instagram, Icon: SocialIcons.Instagram, label: "Instagram" },
-                { href: SITE_CONFIG.social.youtube, Icon: SocialIcons.Youtube, label: "YouTube" },
-                { href: SITE_CONFIG.social.linkedin, Icon: SocialIcons.Linkedin, label: "LinkedIn" },
-              ].map(({ href, Icon, label }) => (
+              {(
+                [
+                  { href: SITE_CONFIG.social.facebook, Icon: SocialIcons.Facebook, label: "Facebook" },
+                  { href: SITE_CONFIG.social.instagram, Icon: SocialIcons.Instagram, label: "Instagram" },
+                  { href: SITE_CONFIG.social.youtube, Icon: SocialIcons.Youtube, label: "YouTube" },
+                  { href: SITE_CONFIG.social.linkedin, Icon: SocialIcons.Linkedin, label: "LinkedIn" },
+                ] as const
+              ).map(({ href, Icon, label }) => (
                 <a
                   key={label}
                   href={href}
@@ -74,7 +76,7 @@ export default function Footer() {
                   aria-label={label}
                   className="w-9 h-9 rounded-lg bg-steel flex items-center justify-center text-gray-400 hover:text-accent hover:bg-accent/10 hover:border-accent/30 border border-transparent transition-all duration-200"
                 >
-                  <Icon size={16} />
+                  <Icon />
                 </a>
               ))}
             </div>

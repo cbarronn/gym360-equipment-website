@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cbarronn.github.io/gym360-equipment-website/sitemap.xml
