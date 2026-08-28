@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GYM 360 Equipment — Sitio Web Corporativo
 
-## Getting Started
+Sitio web publicitario profesional para **GYM 360 Equipment**, empresa especializada en la comercialización, importación, instalación, mantenimiento y refacciones de equipos para gimnasio en México.
 
-First, run the development server:
+---
+
+## 🚀 Inicio rápido
+
+### Requisitos
+
+- Node.js 18+
+- npm o yarn
+
+### Instalación
 
 ```bash
+# Instalar dependencias
+npm install
+
+# Configurar variables de entorno
+cp .env.local.example .env.local
+# Edita .env.local con tus valores reales
+
+# Iniciar servidor de desarrollo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ⚙️ Variables de entorno
 
-## Learn More
+Copia `.env.local.example` a `.env.local` y configura los valores:
 
-To learn more about Next.js, take a look at the following resources:
+| Variable | Descripción | Requerida |
+|---|---|---|
+| `RESEND_API_KEY` | API Key de [Resend](https://resend.com) para envío de correos | Opcional |
+| `CONTACT_EMAIL` | Correo donde recibirás las solicitudes | Recomendada |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Número de WhatsApp (código de país + número, sin espacios) | Recomendada |
+| `NEXT_PUBLIC_GA_ID` | Google Analytics 4 Measurement ID | Opcional |
+| `NEXT_PUBLIC_META_PIXEL_ID` | Meta Pixel ID | Opcional |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📦 Tecnología
 
-## Deploy on Vercel
+| Tecnología | Propósito |
+|---|---|
+| Next.js 14 (App Router) | Framework React con SSR |
+| TypeScript | Tipado estático |
+| Tailwind CSS | Estilos utilitarios |
+| Framer Motion | Animaciones |
+| React Hook Form + Zod | Formularios y validación |
+| Resend | Correos transaccionales |
+| Lucide React | Iconografía |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ✏️ Personalización
+
+Edita `src/lib/constants.ts` para cambiar:
+- **SITE_CONFIG**: teléfono, correo, WhatsApp, ciudad, horarios, redes sociales
+- **CATEGORIES**: categorías de equipos
+- **SERVICES**: servicios ofrecidos
+- **PROJECT_TYPES**: tipos de proyecto
+- **ADVANTAGES**: ventajas competitivas
+
+Reemplaza las imágenes en `public/images/` con fotografías reales.
+
+---
+
+## 🌐 Despliegue
+
+### Vercel (recomendado)
+
+```bash
+npx vercel
+```
+
+Configura las variables de entorno en el dashboard de Vercel.
+
+---
+
+## 📧 Configurar correos
+
+1. Crea cuenta en [resend.com](https://resend.com)
+2. Obtén tu API Key
+3. Configura `RESEND_API_KEY` y `CONTACT_EMAIL` en `.env.local`
+
+---
+
+© 2024 GYM 360 Equipment. Todos los derechos reservados.
