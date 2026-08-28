@@ -4,17 +4,21 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:   # Permite ejecutarlo manualmente desde GitHub
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Solo un despliegue a la vez
 concurrency:
   group: "pages"
   cancel-in-progress: false
+
+# Forzar registry público — evita conflicto con .npmrc privado
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+  NPM_CONFIG_ALWAYS_AUTH: false
 
 jobs:
   build:
@@ -29,6 +33,12 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Limpiar configuración de npm privada
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm config delete always-auth || true
+          npm config list
+
       - name: Install dependencies
         run: npm install
 
@@ -38,7 +48,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out   # Next.js genera los archivos estáticos aquí
+          path: ./out
 
   deploy:
     name: Deploy
