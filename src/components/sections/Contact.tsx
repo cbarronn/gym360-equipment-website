@@ -1,20 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Phone, Mail, MapPin, Clock, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
-import { contactSchema, type ContactFormData } from "@/lib/validations";
+import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import { SITE_CONFIG, CONTACT_REASONS, EQUIPMENT_INTEREST } from "@/lib/constants";
-
-// ─────────────────────────────────────────────────────────────
-// FORMSPREE: Crea tu cuenta gratuita en https://formspree.io
-// Reemplaza "YOUR_FORM_ID" con el ID de tu formulario.
-// Ejemplo: si tu endpoint es https://formspree.io/f/xpwzabcd
-// entonces FORMSPREE_ID = "xpwzabcd"
-// ─────────────────────────────────────────────────────────────
-const FORMSPREE_ID = "YOUR_FORM_ID";
 
 const BUDGETS = [
   "Menos de $50,000",
@@ -25,59 +14,16 @@ const BUDGETS = [
   "Por definir / No especificado",
 ];
 
+const inputClass =
+  "w-full bg-steel border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-accent/60 focus:ring-1 focus:ring-accent/30 transition-all duration-200";
+
 export default function Contact() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ContactFormData>({
-    resolver: zodResolver(contactSchema),
-  });
-
-  const onSubmit = async (data: ContactFormData) => {
-    setStatus("loading");
-    try {
-      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          nombre: data.nombre,
-          empresa: data.empresa || "",
-          telefono: data.telefono,
-          correo: data.correo,
-          _replyto: data.correo,
-          ciudad: data.ciudad,
-          tipoProyecto: data.tipoProyecto,
-          equipos: data.equipos || "",
-          presupuesto: data.presupuesto || "",
-          mensaje: data.mensaje,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Error al enviar");
-      setStatus("success");
-      reset();
-    } catch {
-      setStatus("error");
-    }
-  };
 
   const whatsappUrl = `https://wa.me/${SITE_CONFIG.whatsapp}?text=${encodeURIComponent(
     "Hola, me interesa recibir información sobre equipos de gimnasio de GYM 360 Equipment."
   )}`;
-
-  const inputClass = (hasError: boolean) =>
-    `w-full bg-steel border ${
-      hasError ? "border-red-500/60" : "border-white/10"
-    } rounded-xl px-4 py-3.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-accent/60 focus:ring-1 focus:ring-accent/30 transition-all duration-200`;
 
   return (
     <section id="contacto" className="section-padding section-dark" ref={ref}>
@@ -159,7 +105,7 @@ export default function Contact() {
             </div>
           </motion.div>
 
-          {/* Form */}
+          {/* Form — Solo visual, sin funcionalidad */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
@@ -167,212 +113,115 @@ export default function Contact() {
             className="lg:col-span-3"
           >
             <div className="card-dark p-8 md:p-10 rounded-2xl">
-              {status === "success" ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-12"
-                >
-                  <div className="w-20 h-20 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle size={40} className="text-accent" />
-                  </div>
-                  <h3 className="font-black text-white text-2xl mb-3">
-                    ¡Solicitud enviada con éxito!
-                  </h3>
-                  <p className="text-gray-300 mb-2">
-                    Gracias por contactarnos. Un asesor de GYM 360 Equipment se comunicará contigo a la brevedad.
-                  </p>
-                  <button
-                    onClick={() => setStatus("idle")}
-                    className="mt-8 btn-secondary"
-                  >
-                    Enviar otra solicitud
-                  </button>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
-                  {/* Row 1 */}
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
-                        Nombre *
-                      </label>
-                      <input
-                        {...register("nombre")}
-                        type="text"
-                        placeholder="Tu nombre completo"
-                        className={inputClass(!!errors.nombre)}
-                      />
-                      {errors.nombre && (
-                        <p className="text-red-400 text-xs mt-1">{errors.nombre.message}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
-                        Empresa
-                      </label>
-                      <input
-                        {...register("empresa")}
-                        type="text"
-                        placeholder="Nombre de tu empresa (opcional)"
-                        className={inputClass(false)}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Row 2 */}
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
-                        Teléfono *
-                      </label>
-                      <input
-                        {...register("telefono")}
-                        type="tel"
-                        placeholder="+52 (55) 0000-0000"
-                        className={inputClass(!!errors.telefono)}
-                      />
-                      {errors.telefono && (
-                        <p className="text-red-400 text-xs mt-1">{errors.telefono.message}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
-                        Correo electrónico *
-                      </label>
-                      <input
-                        {...register("correo")}
-                        type="email"
-                        placeholder="tu@correo.com"
-                        className={inputClass(!!errors.correo)}
-                      />
-                      {errors.correo && (
-                        <p className="text-red-400 text-xs mt-1">{errors.correo.message}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Row 3 */}
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
-                        Ciudad *
-                      </label>
-                      <input
-                        {...register("ciudad")}
-                        type="text"
-                        placeholder="Tu ciudad"
-                        className={inputClass(!!errors.ciudad)}
-                      />
-                      {errors.ciudad && (
-                        <p className="text-red-400 text-xs mt-1">{errors.ciudad.message}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
-                        Motivo de consulta *
-                      </label>
-                      <select
-                        {...register("tipoProyecto")}
-                        className={`${inputClass(!!errors.tipoProyecto)} appearance-none`}
-                        defaultValue=""
-                      >
-                        <option value="" disabled>Selecciona una opción</option>
-                        {CONTACT_REASONS.map((r) => (
-                          <option key={r} value={r} className="bg-steel">{r}</option>
-                        ))}
-                      </select>
-                      {errors.tipoProyecto && (
-                        <p className="text-red-400 text-xs mt-1">{errors.tipoProyecto.message}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Row 4 */}
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
-                        Equipos de interés
-                      </label>
-                      <select
-                        {...register("equipos")}
-                        className={`${inputClass(false)} appearance-none`}
-                        defaultValue=""
-                      >
-                        <option value="" className="bg-steel">Selecciona (opcional)</option>
-                        {EQUIPMENT_INTEREST.map((e) => (
-                          <option key={e} value={e} className="bg-steel">{e}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
-                        Presupuesto estimado
-                      </label>
-                      <select
-                        {...register("presupuesto")}
-                        className={`${inputClass(false)} appearance-none`}
-                        defaultValue=""
-                      >
-                        <option value="" className="bg-steel">Selecciona (opcional)</option>
-                        {BUDGETS.map((b) => (
-                          <option key={b} value={b} className="bg-steel">{b}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Message */}
+              <div className="space-y-5">
+                {/* Row 1 */}
+                <div className="grid sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
-                      Mensaje *
+                      Nombre
                     </label>
-                    <textarea
-                      {...register("mensaje")}
-                      rows={4}
-                      placeholder="Cuéntanos sobre tu proyecto: espacio disponible, número de usuarios, equipos que necesitas, fechas, etc."
-                      className={`${inputClass(!!errors.mensaje)} resize-none`}
-                    />
-                    {errors.mensaje && (
-                      <p className="text-red-400 text-xs mt-1">{errors.mensaje.message}</p>
-                    )}
+                    <input type="text" placeholder="Tu nombre completo" className={inputClass} readOnly />
                   </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                      Empresa
+                    </label>
+                    <input type="text" placeholder="Nombre de tu empresa (opcional)" className={inputClass} readOnly />
+                  </div>
+                </div>
 
-                  {/* Error */}
-                  {status === "error" && (
-                    <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
-                      <AlertCircle size={18} className="text-red-400 flex-shrink-0" />
-                      <p className="text-red-400 text-sm">
-                        Ocurrió un error al enviar. Intenta de nuevo o contáctanos directamente por WhatsApp.
-                      </p>
-                    </div>
-                  )}
+                {/* Row 2 */}
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                      Teléfono
+                    </label>
+                    <input type="tel" placeholder="+52 (55) 0000-0000" className={inputClass} readOnly />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                      Correo electrónico
+                    </label>
+                    <input type="email" placeholder="tu@correo.com" className={inputClass} readOnly />
+                  </div>
+                </div>
 
-                  {/* Submit */}
-                  <button
-                    type="submit"
-                    disabled={status === "loading"}
-                    className="btn-primary w-full disabled:opacity-70 disabled:cursor-not-allowed py-4 text-base"
-                  >
-                    {status === "loading" ? (
-                      <>
-                        <Loader2 size={18} className="animate-spin" />
-                        Enviando solicitud...
-                      </>
-                    ) : (
-                      "Enviar solicitud"
-                    )}
-                  </button>
+                {/* Row 3 */}
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                      Ciudad
+                    </label>
+                    <input type="text" placeholder="Tu ciudad" className={inputClass} readOnly />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                      Motivo de consulta
+                    </label>
+                    <select className={`${inputClass} appearance-none`} defaultValue="" disabled>
+                      <option value="" disabled>Selecciona una opción</option>
+                      {CONTACT_REASONS.map((r) => (
+                        <option key={r} value={r}>{r}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
 
-                  <p className="text-gray-600 text-xs text-center">
-                    Al enviar este formulario aceptas nuestra{" "}
-                    <a href="/privacidad" className="text-gray-400 hover:text-white underline">
-                      política de privacidad
-                    </a>
-                    . Toda la información está protegida.
-                  </p>
-                </form>
-              )}
+                {/* Row 4 */}
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                      Equipos de interés
+                    </label>
+                    <select className={`${inputClass} appearance-none`} defaultValue="" disabled>
+                      <option value="">Selecciona (opcional)</option>
+                      {EQUIPMENT_INTEREST.map((e) => (
+                        <option key={e} value={e}>{e}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                      Presupuesto estimado
+                    </label>
+                    <select className={`${inputClass} appearance-none`} defaultValue="" disabled>
+                      <option value="">Selecciona (opcional)</option>
+                      {BUDGETS.map((b) => (
+                        <option key={b} value={b}>{b}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Message */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                    Mensaje
+                  </label>
+                  <textarea
+                    rows={4}
+                    placeholder="Cuéntanos sobre tu proyecto: espacio disponible, número de usuarios, equipos que necesitas, fechas, etc."
+                    className={`${inputClass} resize-none`}
+                    readOnly
+                  />
+                </div>
+
+                {/* Submit — decorativo */}
+                <div className="btn-primary w-full py-4 text-base justify-center opacity-80 cursor-default select-none">
+                  Enviar solicitud
+                </div>
+
+                <p className="text-gray-600 text-xs text-center">
+                  Próximamente disponible. Por ahora contáctanos por{" "}
+                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="text-[#25d366] hover:underline font-medium">
+                    WhatsApp
+                  </a>{" "}
+                  o al{" "}
+                  <a href={`mailto:${SITE_CONFIG.email}`} className="text-accent hover:underline">
+                    {SITE_CONFIG.email}
+                  </a>
+                </p>
+              </div>
             </div>
           </motion.div>
         </div>
